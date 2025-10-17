@@ -1,3 +1,300 @@
-<!-- udah gw enc, mau rename kah dek? wkwk -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zyrex Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+body {
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:#020a08;
+  color:#e8ffe8;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  overflow:hidden;
+  text-align:center;
+}
+canvas {position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;}
+.card {
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(15px);
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 4px 25px rgba(0,255,170,0.25);
+  max-width:300px;
+  width:85%;
+  box-sizing:border-box;
+  animation:fadeIn 1s ease;
+}
+
+/* Profile */
+.profile { display:flex; justify-content:center; margin-bottom:12px; }
+.profile img {
+  width:90px; height:90px; border-radius:50%;
+  border:3px solid #00ff99; box-shadow:0 0 20px #00ff99;
+}
+
+/* Input + Button */
+input {
+  width:90%;
+  padding:9px;
+  margin:6px 0;
+  border-radius:10px;
+  border:none;
+  outline:none;
+  font-size:13px;
+  background:rgba(255,255,255,0.08);
+  color:#e8ffe8;
+}
+button {
+  width:95%;
+  padding:9px;
+  margin-top:10px;
+  border-radius:10px;
+  border:none;
+  cursor:pointer;
+  font-size:14px;
+  background:linear-gradient(45deg,#00ff99,#00b3ff);
+  color:#fff;
+  font-weight:600;
+  transition:background 0.3s;
+}
+button:hover { background:linear-gradient(45deg,#00ffaa,#33ccff); }
+
+/* Progress Bar */
+.progress-bar {
+  width: 90%;
+  height: 8px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  margin: 12px auto;
+  overflow: hidden;
+  display: none;
+}
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg,#00ff99,#00b3ff);
+  border-radius: 10px;
+  transition: width 0.1s linear;
+}
+
+.wait-text { margin-top:5px;font-size:13px;display:none;color:#ccffee; }
+
+/* Notifikasi */
+.notification {
+  position:fixed;bottom:-60px;left:50%;transform:translateX(-50%);
+  padding:10px 20px;border-radius:10px;font-size:13px;font-weight:500;
+  opacity:0;transition:all 0.5s ease;color:#fff;
+}
+.notification.show { bottom:30px; opacity:1; }
+.notification.active { background:rgba(0,200,100,0.9); }
+.notification.nonactive { background:rgba(200,0,70,0.9); }
+
+/* Panel fitur */
+.buttons {
+  margin-top:15px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:0 5px;
+  max-height: 230px; /* ⬅️ disesuaikan agar 5 fitur terlihat penuh */
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+.toggle-btn {
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(255,255,255,0.08);
+  padding:7px 10px;border-radius:10px;
+  font-size:13px;font-weight:500;
+  transition:background 0.3s;
+  min-height:40px;
+}
+.toggle-btn:hover { background:rgba(0,255,200,0.25); }
+
+/* Switch toggle */
+.switch {position:relative;display:inline-block;width:36px;height:18px;}
+.switch input {opacity:0;width:0;height:0;}
+.slider {
+  position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;
+  background-color:#444;transition:.4s;border-radius:20px;
+}
+.slider:before {
+  position:absolute;content:"";height:12px;width:12px;left:3px;bottom:3px;
+  background-color:white;transition:.4s;border-radius:50%;
+}
+input:checked + .slider {background:linear-gradient(90deg,#00ff99,#00b3ff);}
+input:checked + .slider:before {transform:translateX(18px);}
+
+/* Scrollbar custom */
+.buttons::-webkit-scrollbar { width:6px; }
+.buttons::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); border-radius:8px; }
+.buttons::-webkit-scrollbar-thumb { background: rgba(0,255,170,0.12); border-radius:8px; }
+.buttons::-webkit-scrollbar-thumb:hover { background: rgba(0,255,170,0.2); }
+
+footer {margin-top:10px;font-size:10px;opacity:0.6;}
+
+@keyframes fadeIn { from {opacity:0;transform:translateY(15px);} to {opacity:1;transform:translateY(0);} }
+.fade-in {opacity:0;transform:translateY(20px);transition:opacity 0.8s ease, transform 0.8s ease;}
+.fade-in.show {opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+
+<!-- LOGIN -->
+<div class="card" id="loginCard">
+  <div class="profile"><img src="profile.jpg" alt="Profil"></div>
+  <h2>Login Panel</h2>
+  <input type="text" id="username" placeholder="Username">
+  <input type="password" id="password" placeholder="Password">
+  <button id="loginBtn">Login</button>
+  <div class="progress-bar" id="progressBar">
+    <div class="progress-bar-fill" id="progressFill"></div>
+  </div>
+  <div class="wait-text" id="waitText">Please Wait</div>
+  <p style="margin-top:10px;font-size:10px;opacity:0.6;">
+    © 2025 The Zyrex. All rights reserved.
+  </p>
+</div>
+
+<!-- PANEL FITUR -->
+<div class="card fade-in" id="panelCard" style="display:none;">
+  <div class="profile"><img src="profile.jpg" alt="Profil"></div>
+  <h2>Zyrex Panel</h2>
+
+  <div class="buttons" id="featuresContainer">
+    <div class="toggle-btn">Aimbot Head 💀
+      <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+    </div>
+    <div class="toggle-btn">Aim Body (Badan Hs) ☠️
+      <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+    </div>
+    <div class="toggle-btn">Hologram All Character 👾
+      <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+    </div>
+    <div class="toggle-btn">Esp Line & Box 👺
+      <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+    </div>
+    <div class="toggle-btn">Bypass Anti Banned ✅
+      <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+    </div>
+
+    <!-- Fitur tambahan -->
+    <div class="toggle-btn">Auto Aim AWM 🎯
+      <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+    </div>
+  </div>
+  <footer>© 2025 The Zyrex. All rights reserved.</footer>
+</div>
+
+<div id="notification" class="notification"></div>
+
 <script>
-let ViNIZm = ["VUVOR1JWUXdUbFZYVmtKR1NVZG9NR0pYZHl0RGFuaHZaRWN4YzBsSGVHaGli","V001U1cxV2RVbHFORXRRUjJoc1dWZFJLME5xZUhSYVdGSm9TVWRPYjFsWVNu","cGFXRkU1U1d4V1ZWSnBNRFJKYWpSTFVFY3hiR1JIUldkaWJVWjBXbFF3YVdS","dGJHeGtNMEoyWTI1UmFVbEhUblppYmxKc1ltNVJPVWx1WkhCYVNGSnZVRmRT","YkdSdGJHcGFVekV6WVZkU01HRkRkMmRoVnpWd1pFZHNhR0pETVhwWk1rWnpX","bFF3ZUV4cVFXbFFaMjg0WkVkc01HSkhWU3RYYm14NVdsaG5aMVZIUm5WYVYz","YzRURE5TY0dSSGVHeFFaMjg0WWtkc2RXRjVRbTlqYlZadFVGTktiMlJJVW5k","amVtOTJUREphZG1KdVVucE1iV1IyWWpKa2MxcFhSbmRoV0UxMVdUSTVkRXd5","VG5wamVra3ZXbTFHZEdGWGVEVlFWa0oyWTBoQ2NHSnVUVFprTW1SdlpFVkJN","RTFFUVRkT2FrRjNTbTFTY0dNelFuTlpXR3M1WXpOa2FHTkRTV2RqYlZaelVG","TktlbVJJYkhOYVdFNXZXbGRXTUVscU5FdFFTRTR3WlZkNGJGQm5jR2xpTWxJ","MVNVaHpTMGxEUW5SWldFcHVZVmMwTmsxRWMwdEpRMEp0WWpJMU1FeFhXbWhp","VjJ4elpWUnZibFZIT1hkalIyeDFZM2xqYzJNeVJuVmplVEY2V2xoS2NGcHFj","MHRKUTBKcFdWZE9jbG96U25aa1Z6VnJUMmxOZDAxcVFtaE5SR2MzUTJsQlox","a3lPWE5pTTBrMlNUSlZORnB0V214UFJITkxTVU5DYTJGWVRuZGlSMFkxVDIx","YWMxcFlaemREYVVGbllXNVdlbVJIYkcxbFV6RnFZakkxTUZwWE5UQlBiVTVz","WW01U2JHTnFjMHRKUTBKb1lrZHNibUpwTVhCa1IxWjBZM3B3YWxwWE5UQmFX","RWszUTJsQloySlhiSFZNVjJoc1lWZGtiMlJFYjNoTlJFSXlZVVJ6UzBsRFFu","WmtiVlo1V20xNGRtUjZjRzloVjFKcldsYzBOME5wUVdka1IxWTBaRU14YUdK","SGJHNWlhbkJxV2xjMU1GcFlTVGREYmpCTFdUSkdkV1J0Um5wSlNIUjNZak5P","Y0dSSGJIWmlhbkJ0WVZob2JGcEVkREJpTTBFMlRVUjBjMXBYV2pCUGFrRTNa","REpzYTJSSFp6Wk5WRUYzU2xSMGIxcFhiRzVoU0ZFMlRWUkJkMHBVZERaTVYy","eDFXa2RXTkU5cE1IaFBNekJMVEcxT2FHTnRVV2RsZDI5blNVZEthRmt5ZEc1","amJUa3hZbTFSTm1OdFpHbFpVMmQ1VGxSVmMwMXFWVEZNUkVreFRsTjNkMHhx","UVRGTFZITkxTVU5DYVZsWFRuSmFTRXAyWTBNeGJXRlhlREJhV0VrMldXMTRN","V05wWjNoT1dFSTBTMVJ6UzBsRFFtbGlNMHByV2xoSmRHTnRSbXRoV0ZaNlQy","cEZOR05JWnpkRGFVRm5ZMGRHYTFwSGJIVmFlbTk1VFVoQ05FOTNiMmRKUjBw","MlpVTXhlbUZIUm10aU0yTTJUVU5CTUdOSVoyZE5hbFozWlVOQ2VWb3lTbWhM","UkVGelRXcFZNVXhFUlROTlEzZDNUR3BKTVV0VWMwdEpRMEowV1ZobmRHUXli","R3RrUjJjMlRYcEJkMk5JWnpkRGFVRm5aREpzYTJSSFp6WlBSRlZzVDNkdlow","bEhTblpsUXpGNllWaHdjR0p0WXpaWmJUbDVXa2RXZVV4WFNuWmxSSE5MU1VO","Q2FHSnRiSFJaV0ZKd1lqSTBObHB0Um10YVZXeDFTVVJHZWtsSFZtaGpNbFUz","UTI0d1MwTnBPSEZKUmtKNVlqSmFjR0pIVldkTGFUaExURzVDZVdJeVduQmlS","MVZuWlhsQ2EyRllUbmRpUjBZMVQyMWFjMXBZWnpkSlIzQXhZek5TY0ZwdWEz","UlpNamwxWkVkV2RXUkVjR3BhVnpVd1dsaEpOMGxITVdoamJXUndZbWt4YVdJ","elVqQmlNakEyVFZSS2QyVkVjMmRtVVc5MVkwaEtkbHB0YkhOYVUwSndZbGRq","WjJWM2IyZEpTR1J3V2toU2IwOXFhM2RqU0djM1NVZG9iR0ZYWkc5a1JHODFU","VWhDTkU5NVFtbGlNMHByV2xoSmRHTnRSbXRoV0ZaNlQycFZkMHBVYzB0SlEw","SnBZak5LYTFwWVNUWk5NMEkwU1VoT2RtSkhiR3RKUTAxM1RVZGFiVTlVYXpk","SlIwcDJaVU14ZW1GSFJtdGlNMk0yVFVOQmQwbEVTWGRqU0dkblNYcEJkMXB0","V1RWUFZITkxabEZ2UzB4NWIyZFRWelYzWkZoUlowdDVRa05rV0ZJd1lqSTBa","MHRwT0V0aFZ6VjNaRmhSWjJWM2IyZEpTR1J3V2toU2IwOXFhM2RLVkhOTFNV","TkNkMWxYVW10aFZ6VnVUMnBzZDJWRWMwdEpRMEowV1ZoS2JtRlhORFpPYmtJ","MFNVUkJOME5wUVdkWmJUbDVXa2RXZVV4WVNtaGFSMnd4WTNwdmVFMUlRalJQ","ZDI5blNVZEtkbU50VW14amFuQjFZakkxYkU5M2IyZEpSemt4WkVkNGNHSnRW","VFppYlRsMVdsUnpTMGxEUW0xaU1qVXdURmhPY0dWdFZUWk5WRTUzWlVSelMw","bERRbWxaVjA1eVdqTktkbVJYTld0UGJrcHVXVzFGYjAxcVZURk1SRWt4VGxO","M2VVNVVWWE5OUXpSM1QwTnJOME5wUVdkWk1qbHpZak5KTmtreVZUUmFiVnBz","VDBSelMyWlJjR2xrV0ZJd1lqSTBaMlYzYjJkSlNHUndXa2hTYjA5cWF6RktW","SE5MU1VOQ2QxbFhVbXRoVnpWdVQycHNkMlZFYzB0SlEwSjBXVmhLYm1GWE5I","UmtSemwzVDJwRmQyTklaemREYVVGbldXMDVlVnBIVm5sTVdFcG9Xa2RzTVdO","NmIzaE5TRUkwVDNkdlowbEhTblpqYlZKc1kycHdkV0l5Tld4UGQyOW5TVWRP","TVdOdVRuWmphbkIzWWpKc2RXUkhWbmxQZDI5blNVZGFkbUp1VVhSak1tdzJX","bFJ2ZUU1SVFqUlBkMjluU1VkS2FGa3lkRzVqYlRreFltMVJObUpIYkhWYVYw","WjVURmRrZVZsWFVuQmFWelV3UzBSUk1WcEhWbTVNUTAxM1RVZGFiVTlVYTNO","SmVrRjNXV3BPYlZwcGF6ZERhVUZuV1RJNWMySXpTVFpKTWxwdFdtcHpTMGxE","UW0xaU1qVXdURmhrYkdGWFpHOWtSRzh5VFVSQk4wTnBRV2RrU0Vwb1ltNU9j","R1JIYkhaaWFuQnBXVmRPY2xvelNuWmtWelZyU1VSQmRVMHpUVGREYmpCTFdX","NVdNR1JIT1hWUGJXaDJaRzFXZVVsSWMyZFpiVVpxWVRKa2VXSXpWblZhUkhC","ellWYzFiRmxZU1hSYU0wcG9Xa2RzYkdKdVVXOU9SRlpyV2xkamMwbDZRWGRh","YlZwb1dWTjNhazE2VG1wWk1scHRTMVJ6WjJaUmIwdE1lVzluVlVoS2Rsb3pT","bXhqTTAxblVXMUdlVWxEYjNaRGFUVjNZMjA1Ym1OdFZucGplVEZwV1ZoSloy","VjNiMmRKU0dSd1draFNiMDlwUVRWTlExVTNRMmxCWjJGSFZuQmFNbWd3VDJs","Qk5HTklaemREYVVGbldXMUdhbUV5WkhsaU0xWjFXa1J2WjJOdFpHbFpVMmQ1","VGxSVmMwMXFWVEZNUkVreFRsTjNkMHhxUlRGTFZITkxTVU5DYVdJelNtdGFX","RWwwWTIxR2EyRllWbnBQYVVGNFRVaENORTkzYjJkSlJ6Rm9ZMjFrY0dKcWIy","ZE5WRXAzWlVOQ2FHUllVblpQZDI5blNVYzVNbHBZU20xaVJ6a3pUMmxDYjJG","WFVtdGFWelEzUTJsQloxcEhiSHBqUjNob1pWUnZaMkp0T1hWYVZITkxabEZ2","ZFdOSVNuWmFNMHBzWXpOTmRGbHRSbmxNVjFwd1lrZDNaMlYzYjJkSlIyaHNZ","VmRrYjJSRWIyZE5WRUYzU2xSelMwbERRak5oVjFJd1lVUnZaMDFEVlRkRGFV","Rm5XVzFHYW1FeVpIbGlNMVoxV2tSdloySkhiSFZhVjBaNVRGZGtlVmxYVW5C","YVZ6VXdTMFJyZDFwSFZtNU1RMDEzVFVkYWJVOVVhM05KZWtGM1dXcE9iVnBw","YXpkRGFVRm5XVzA1ZVZwSFZubE1XRXBvV2tkc01XTjZiMmROVkVKM1pVUnpT","MGxEUWpCamJVWjFZekpzTUdGWE9YVlBhVUl6WVZkU01HRkRRWGRNYWtaNlNV","ZDRjR0p0Vm1oamFuTkxabEZ2UzB4dVpHaGhXRkYwWkVkV05HUkRRamRKUnpG","b1kyMWtjR0pwTVRCaU0wRTJUbGhDTkU4eVduWmlibEYwWXpKc05scFViM2hO","TTBJMFR6SlNjR016UW5OWldHczJZbTA1ZFZwVWRHcGlNbmgyWTJwdmFsa3lU","bTFhYlZac1QzbENPVU5uYjNaTGFVSlBZak5TY0ZwdGJISlpXRTV3U1VOdmRr","TnBOWFZpTTFKd1dtMXNhbGxZVW5CaU1qUm5aWGR2WjBsSVFuWmpNbXd3WVZj","NWRVOXRXbkJsUjFaclR6SktkbVJJVW5aaVZHOTBUbXBDZDJWRWRITmFWMW93","VDJwVmQwcFVkREJqYlVaMVl6SmFkbU50TURaa1NFcG9ZbTVPYzFsWVVteFhR","MmQwVGxSQmJFdFVjMHRKUTBKM1dWZFNhMkZYTlc1UGFrVjNZMGhuWjAxcVFu","ZGxSSFJwWWpOS2ExcFlTWFJqYlVacllWaFdlazlxUlhkalNHYzNXbTA1ZFdS","RE1YcGhXSEJzVDJwRmVtTklaemRhYlRsMVpFTXhNMXBYYkc1aFNGRTJUbFJC","ZDA5M2IyZEpSemwzV1ZkT2NHUklhelpOUkhRd1kyMUdkV015YkRCaFZ6bDFU","MjFHYzJKRFFYZE1hbFo2U1VkV2FHTXlWVGRaTWpsellqTkpOa2t5V20xYWFu","TkxabEZ2ZFdKdE9UQmhWMXB3V1RKR01HRlhPWFZNYms1dllqTmpaMlY1UW1s","aU0xSXdZakl3TmsxNlFuZGxSSE5uWWpOQ2FGa3liREJsVkc5NFQzbENPVU5w","TlhWaU0xSndXbTFzYWxsWVVuQmlNalIxV1ZkT01HRllXbXhKU0hObldXMUdh","bUV5WkhsaU0xWjFXa1J3ZVZveVNtaExSRUZ6VFdwQmQweEVSWGROUTNkM1RH","cHJjRTk1UWpsRGFUVjFZak5TY0ZwdGJHcFpXRkp3WWpJMGRXSnRPWFZaVjA0","d1lWaGFiRWxJYzJkWmJVWnFZVEprZVdJelZuVmFSSEI1V2pKS2FFdEVTWGRO","UTNkM1RFUmpkMHhFUVhWUFUyczNTVWd3UzBOcE9IRkpSa0pvWW0xV2MwbEhX","bkJrU0ZaNVNVTnZka05wTldsa1dGSXdZakkxZWtsSWMwdEpRMEowV1ZoS2Jt","RlhOSFJrUnpsM1QycEZNV05JWnpkRGFVRm5Xa2RzZW1OSGVHaGxWSEJ0WWtk","V05FOTNiMmRKUjFweldsaG5kRnBIYkhsYVYwNHdZVmM1ZFU5dFRuWmlTRlow","WW1welMwbERRbTVaV0VFMlRtNUNORTkzYjJkSlNFSm9Xa2RTY0dKdFl6Wk5R","MEV4WTBobk4wTnBRV2RpVjBZMFRGZG9iR0ZYWkc5a1JHOW5UV3BOZDJOSVp6","ZEpRemh4U1U5TGMyaGxLelJxZVVKcllWaE9iR016Vm1oaFYzUm9ZbWxDYUZv","eVJubEpSRlZuV20xc01HUllTV2RrUjFaNVlrZHNiMWxZVVdkalIxWjFaRmRu","WjB0cE9FdEpRMEoyWkcxV2VWcHRlSFprZVRFMVQyMUdNV1JIT0RkRGFVRm5U","RmhrYkZsdGRIQmtRekYyWkcxV2VWcHRlSFprZVRGNldUTktkbUpIZUhCaWJX","TTJaRWM1TVZreVp6ZERiakJMUTJrMU1HSXlaRzVpUjFWMFdXNVNkVWxJYzB0","SlEwSnJZVmhPZDJKSFJqVlBiVnB6V2xobk4yRnVWbnBrUjJ4dFpWTXhhbUl5","TlRCYVZ6VXdUMjVPZDFsWFRteE1WMHBzWkVoa2JGcFhORGRaVjNod1dqSTBk","R0ZZVW14aVdFMDJXVEpXZFdSSFZubFBkMjluU1VkS2FGa3lkRzVqYlRreFlt","MVJObU50WkdsWlUyZDVUbFJWYzAxcVZURk1SRWt4VGxOM2QweHFRVFJMVkhO","TFNVTkNkMWxYVW10aFZ6VnVUMnBrZDJWRFFYaE5TRUkwVHpKS2RtTnRVbXhq","YVRGNVdWZFNjR1JZVFRaTlZFSjNaVVJ6UzBsRFFtMWlNalV3VEZoT2NHVnRW","VFpOVkU1M1pVUjBiV0l5TlRCTVdHUnNZVmRrYjJSRWJ6Rk5SRUUzUTJsQloy","UklTbWhpYms1d1pFZHNkbUpxY0dsWlYwNXlXak5LZG1SWE5XdEpSRUYxVFRO","Tk4wTnBRV2RpVjJ4MVRGZG9iR0ZYWkc5a1JHOHdUVWhDTkU5M2NEbERhVFV3","WWpKa2JtSkhWWFJaYmxKMVQyMW9kbVJ0Vm5sSlNITm5XVzFHYW1FeVpIbGlN","MVoxV2tSd2VWb3lTbWhMUkVGelRXcFZNVXhFU1hkTlEzZDNUR3BKTVV0VWMy","ZG1VVzlMVEhsdloxVXpaSEJrUjA1dlNVaFNkbG95WkhOYVUwRnhUSGR2ZFdN","elpIQmtSMDV2U1VoMGQySXpUbkJrUjJ4MlltcHdlVnBYZUdoa1Iyd3lXbFIw","YTJGWVRuZGlSMFkxVDIxc2RXSkhiSFZhVXpGcFlrYzVhbUY2ZEROaFYxSXdZ","VVJ2ZWs1dVFqUlBNbWhzWVZka2IyUkViM2hQU0VJMFR6TXdTMHh1VGpOaFdG","SnFZVU5DY0dKdVFqRmtRMEkzWWpOQ2FGa3liREJsVkc5M1R6TmtjRnBJVW05","UGFrRTNZVWRXY0ZveWFEQlBha0UzWmxGdmRXTXllSEJhUjFaNVNVaHpTMGxE","UW5kaU0wNXdaRWRzZG1KcWNHaFpiazUyWWtoV01GcFVkR3BrV0VwNllqTkpO","bU5IT1hCaWJsSnNZMnAwTUdJelFUWk5SSFJ6V2xkYU1FOXFRVGRqYld4dVlV","aFJOazFFZEdsaU0xSXdZakl3TmsxRWMwdEpRMEpwV1ZkT2Nsb3pTblprVnpW","clRGZE9kbUpIT1hsUGFVMHdUa1JSTjJSSVNtaGliazV3WkVkc2RtSnFiM1ZP","U0UwM1dXMDVlVnBIVm5sTVdFcG9Xa2RzTVdONmIzbE5TRUkwVDNkd09VTnBO","WHBpUjJ4cldsaEpObGx0Vm0xaU0wcHNTVWh6UzBsRFFuZGlNMDV3WkVkc2Rt","SnFjR2haYms1MllraFdNRnBVZEdwaU1qVXdXbGMxTUU5cFNXbFBNbWhzWVZk","a2IyUkViM2hOYmtJMFR6TmtjRnBJVW05UGFrVjVZMGhuTjJKSFZtMWtSRzk2","WTBobk4xbHRPVEJrUnpsMFQycE9kMlZFYzB0SlEwSnBXVmRPY2xvelNuWmtW","elZyVEZkT2RtSkhPWGxQYm1SdllWaFNiRTh6VW5sWlZ6VjZZVmhTY0dJeU5E","Wk1hbEo2VHpKS2RtTnRVbXhqYVRGNVdWZFNjR1JZVFRaT1ZFRnNUM2R3T1VO","dGJIVmpTRll3VDIxT2IxcFhUbkphVjFGblMzbEJkV015ZUhCYVIxWjVTVWgw","YVZsWFRuSmFNMHAyWkZjMWEwOXRlSEJpYlZab1kya3hibU50Um10aFYxWjFa","RU5uTlUxSFVteGFlWGRxVFVSQ2JWcHFhelZNUTAxM1RVZEplbHB0V1hCUE16","QkxZVmMxZDJSWVVUWlpNbWhzV1RKMGJGcERRWEpKUXpWNllrZHNhMXBZU1Ra","WmJWWnRZak5LYkVsSWREQmpiVVoxWXpKYWRtTnRNRFprU0Vwb1ltNU9jMWxZ","VW14WFEyZDRUMGhDTkV0VWREbERaMjkyUzJsQ1ZGa3pTblppUjNocFdWaEpa","MWt6Vm5wa1J6bDBTVU52ZGtOcE5XbGtXRkl3WWpJMWVrOXFiM1JrTWxacFlU","SnNNRXhZVG1wamJUbHpZa2RLYUdOcFFqZEpTR1J3V2toU2IwOXFXbmRsUkhO","blpsRnZkVmx1VmpCa1J6bDFZM3B2Tmt4WVpHeFpiWFJ3WkVNeGVsa3pTblpp","UjNocFdWaEpkR1JJU21oWk1uTm5aWGxDYVZsWFRuSmFNMHAyWkZjMWEwOXBR","bmxhTWtwb1MwUkpNVTVUZDNsT1ZGVnpUV3BWTVV4RVFYVk5SRTF3VDNsQ2FX","SXpTbXRhV0VsMFkyMUdhMkZZVm5wUGFtaDNaVVJ6WjJaUmIzVlpibFl3WkVj","NWRXTjZielpNV0dSc1dXMTBjR1JETVhwWk0wcDJZa2Q0YVZsWVNYUmtSMmd4","WWxkSloyVjVRbWxaVjA1eVdqTktkbVJYTld0UGFVSjVXakpLYUV0RVFYTk5h","bFV4VEVSRk0wMURkM2RNYWtWNVMxUnpaMWx0T1hsYVIxWjVURmhLYUZwSGJE","RmplbTgwWTBobk4wbElNRXRNYlVveFpFaFNkbUp1VFRaUGFURXpXbGRLY21G","WVVYUmpNazU1WWpKNGMxbHRSbmxNV0ZKdlpGY3hhVTl0YUhaa2JWWjVTVWh6","WjFsdFJtcGhNbVI1WWpOV2RWcEViMmRqYldScFdWTm5kMHhFU1RGT1UzZDRU","bnBCYzAxRE5IbExWSE5uWmxGdlMxcHRPWFprUjFaNVNVaDBkRmxZU201aFZ6","UjBaRWM1ZDA5cVJYZGpTR2MzV20wNWRXUkRNWHBoV0hCc1QycEZkMk5JWnpk","aU0wSm9XVEpzTUdWVWIzZE1hbGszWmxGdlMxRkhkR3hsVjFwNVdWY3hiR041","UW0xWlYxSnNVMWMwWjJWNVFtMWpiVGwwU1VoMGRtTkhSbXBoV0ZJMVQycEJO","MlJJU21oaWJrNXRZak5LZEU5dVVubFpWelY2WWtkR01GcFdhMjlOVkZaM1pV","TnJOMlpUUWpCaWVVSTNZak5DYUZreWJEQmxWRzk0VHpOU2VWbFhOWHBhYlRs","NVlsUndNR050Um5Wak1uaG9aRWRXV2t0RVFYQlBNekJuWmxGdmRWcHRSbXRh","VXpGd1ltbENOMkl6UW1oWk1td3daVlJ2ZDA4elVubFpWelY2V20wNWVXSlVj","REJqYlVaMVl6SjRhR1JIVmxwTFJFbDNZMGhuY0U4elVubFpWelY2WVZoU2NH","SXlORFppTTBKb1dUSnNNR1ZUUVhkTWFtaDZTVWRXYUdNeVZYTkpTRko1V1Zj","MWVscHRPWGxpVTBGM1RHcG9la2xIVm1oak1sVTNabEZ2ZFZwdFJtdGFVekZ3","WW1rMWVtRkhPVE5KU0hSMlkwZEdhbUZZVWpWUGFrVTNaRWhLYUdKdVRtMWlN","MHAwVDI1U2VWbFhOWHBpUjBZd1dsWnJiMDFEYXpkbVVXODRURE5PTUdWWGVH","eFFaMjg0VERKb2JGbFhVU3REYW5ocFlqSlNOVkJuYnpoWk1rWjFaRzFHZWts","SGJHdFFVMHAzV1ZoS01HRlhUbk5hV0UxcFVHcDNkbGt5Um5Wa2JVWjZVR2R2","UzFCRFJYUk1VMEpOVkRCa1NsUnBRWFJNVkRSTFVFZFNjR1JwUW1waVIwWjZZ","M293YVZreVJubGFRMGxuWVZkUk9VbHRlSFphTW14MVVUSkdlVnBEU1N0RGFV","Rm5VRWRTY0dScFFtcGlSMFo2WTNvd2FXTklTblphYld4eldsTkpLMUJIYkhS","YWVVSjZZMjFOT1VsdVFubGlNbHB3WWtkVmRXRnVRbTVKYVVKb1lraFJPVWxz","UW5saU1scHdZa05KSzFCRE9XdGhXRmtyUTJsQloxQkhaM2xRYTNoMldqSnNk","VWxHUW1oaWJWWnpVRU01YjAxcU5FdEpRMEU0WVZjMWQyUllVV2RrU0d4M1ds","UXdhV1JIVmpSa1EwbG5ZVmRST1VsdVZucGFXRXAxV1ZjeGJFbHBRbmRpUjBa","cVdsZG9kbUpIVW14amFqQnBWbGhPYkdOdE5XaGlWMVZwVUdkdlowbEVlSEJp","YmtJeFpFTkNNR1ZZUW14UVUwcDNXVmhPZW1ReU9YbGFRMGxuWVZkUk9VbHVR","bWhqTTA0ellqTkthMGxwUW5kaVIwWnFXbGRvZG1KSFVteGphakJwVlVkR2Vt","TXpaSFpqYlZGcFVHZHZaMGxFZUdsa1dGSXdZakkwWjJGWFVUbEpiWGgyV2pK","c2RWRnVVblZKYWpWTllqSmtjR0pxZDNaWmJsWXdaRWM1ZFZCbmIyZEpSSGhy","WVZoWloxa3llR2hqTTAwNVNXNUNlV0l5WkhsYVdFNTZURmRLYUdOcFNXZGhW","MUU1U1c1Q2VXSXlaSGxhV0U1NlVXMUdlVWxxTkV0SlEwRm5TVVI0YTJGWVdX","ZFpNbmhvWXpOTk9VbHVRbmxpTW1SNVdsaE9la3hYU21oamFURnRZVmQ0YzBs","cFFuQmFSREJwWTBoS2Rsb3pTbXhqTTA1SFlWZDRjMGxxTkRoTU1sSndaR28w","UzBsRFFUaE1NbEp3WkdvMFMwbERRVGhhUjJ3eVNVZE9jMWxZVG5wUVUwb3pX","VmRzTUV4WVVteGxTRkZwU1Vkc2ExQlRTak5aVjJ3d1ZrZFdOR1JEU1N0VlIz","aHNXVmhPYkVsR1pHaGhXRkU0VERKU2NHUnFORXRKUTBFNFkwTkNlbVJJYkhO","YVZEQnBZbGRHZVZveWJIVk1XRkoyWTBSdmVFMUlRalJQTWxwMlltNVJkR015","YkRaYVZHOTRUVWhDTkU4eU9YZFpWMDV3WkVock5rMUROREpQZVVrclEybEJa","MGxEUkVOeFUwRjVUVVJKTVVsR1VtOWFVMEpoWlZoS2JHVkROR2RSVjNoelNV","aEtjRm95YURCamVVSjVXbGhPYkdOdVdteGFRelJMU1VOQk9Fd3pRU3REYW5k","MldrZHNNbEJuYjB0UVEwVjBURk5DVVZGVk5VWlVRMEpIVTFaU1ZsVnBRWFJN","VkRSTFVFZFNjR1JwUW1waVIwWjZZM293YVZreVJubGFRMEp0V1ZkU2JFeFhi","SFZKYVVKd1drUXdhV05IUm5WYVYzaEVXVmhLYTBscFFucGtTR3h6V2xRd2FW","cEhiSHBqUjNob1pWUndkV0l5Tld4UGVVa3JRMmxCWjFCSFVuQmthVUpxWWtk","R2VtTjZNR2xqU0VwMldtMXNjMXBUU1N0UVIyeDBXbmxDZW1OdFRUbEpia0o1","WWpKYWNHSkhWWFZoYmtKdVNXbENhR0pJVVRsSmJFSjVZakphY0dKRFNTdFFR","emxyWVZoWkswTnBRV2RRUjJkNVVHeHdOV050VmpSSlJrSm9ZbTFXYzFCRE9X","OU5halJMUTJsQloxQkhVbkJrYVVKcVlrZEdlbU42TUdsWmJsWXdaRWM1ZFdO","NVNXZGhWMUU1U1cxYWJGbFlVakZqYlZaNlVUSTVkV1JIUm5CaWJWWjVTV28w","UzBsRFFXZEpSSGhyWVZoWloxa3llR2hqTTAwNVNXNVNkbG95WkhOYVV6RnBa","RWMwYVZCclJuQmlWMHAyWkVOQ1NWcFhSbXRKVUVObWEyOUJTMGxEUVdkSlEw","Rm5VRWQ0YUZsdFZuTkpSMDV6V1ZoT2VsQlRTbnBrTW13d1dUSm5hVkJxZUhC","aWJrSXhaRU5DTUdWWVFteFFVMHBxWVVkV2FtRXlTblpsUTBrclVFaE9kMWxY","TkdkWk1uaG9Zek5OT1VsdVRuTmhWMUpzWTJsSksxQkRPWHBqUjBaMVVHcDNk","bUpIUm1sYVYzY3JRMmxCWjBsRFFUaE1NbEp3WkdvMFMwbERRV2RKUkhocllW","aFpaMWt5ZUdoak0wMDVTVzVTZGxveVpITmFVekZwWkVjMGFWQnJSbkJpVTBK","RFlqSlNOVWxEYUVOWlYxSm9ZbWxDU1dONWEyYzBjR2xuTnpkcFVFTnBRV2RK","UTBGblNVUjRjMWxYU214aVEwSnFZa2RHZW1ONk1HbGpNMlJ3WkVkT2IwbHFO","RGhoVnpWM1pGaFJaMlJJYkhkYVZEQnBXVEpvYkZreWRHbGlNMmRwVUdwNGVt","TkhSblZKUjA1eldWaE9lbEJUU25waVIyeHJXbGhKYVZCcWQzWmpNMEpvWW1v","ME9Fd3llR2haYlZaelVHZHZaMGxEUVdkUVF6bHJZVmhaSzBOcFFXZEpRMEU0","V2tkc01rbEhUbk5aV0U1NlVGTktNR0l5Wkc1aVIxVjBXVzVTZFVscU5VbGlN","bmgyV2pOS2FHSlRRa0ppUjNkblVUSm9hR050Um1wa1IxWjVTVkJEWm10aU5F","dEpRMEZuU1VOQloxQkhlR2haYlZaelNVZE9jMWxZVG5wUVUwcDZaREpzTUZr","eVoybFFhbmh3WW01Q01XUkRRakJsV0VKc1VGTkthbUZIVm1waE1rcDJaVU5K","SzFCSVRuZFpWelJuV1RKNGFHTXpUVGxKYms1ellWZFNiR05wU1N0UVF6bDZZ","MGRHZFZCcWQzWmlSMFpwV2xkM0swTnBRV2RKUTBFNFRESlNjR1JxTkV0SlEw","Rm5TVVI0YTJGWVdXZFpNbmhvWXpOTk9VbHVVblphTW1SeldsTXhhV1JITkds","UWExWjZZME5DVFdGWE5XeEpRMWxuVVcwNU5FbFFRMlpyWW05TFNVTkJaMGxE","UVdkUVIzaG9XVzFXYzBsSFRuTlpXRTU2VUZOS2VtUXliREJaTW1kcFVHcDRj","R0p1UWpGa1EwSXdaVmhDYkZCVFNtcGhSMVpxWVRKS2RtVkRTU3RRU0U1M1dW","YzBaMWt5ZUdoak0wMDVTVzVPYzJGWFVteGphVWtyVUVNNWVtTkhSblZRYW5k","MllrZEdhVnBYZHl0RGFVRm5TVU5CT0V3eVVuQmthalJMU1VOQlowbEVlR3Ro","V0ZsbldUSjRhR016VFRsSmJsSjJXakprYzFwVE1XbGtSelJwVUd0S05XTkhS","bnBqZVVKQ1ltNVNjRWxGU21oaWJUVnNXa05FYVc1SlZVdEpRMEZuU1VOQlox","QkhlR2haYlZaelNVZE9jMWxZVG5wUVUwcDZaREpzTUZreVoybFFhbmh3WW01","Q01XUkRRakJsV0VKc1VGTkthbUZIVm1waE1rcDJaVU5KSzFCSVRuZFpWelJu","V1RKNGFHTXpUVGxKYms1ellWZFNiR05wU1N0UVF6bDZZMGRHZFZCcWQzWmlS","MFpwV2xkM0swTnBRV2RKUTBFNFRESlNjR1JxTkV0RGFVRm5TVU5CT0VsVE1I","UkpSVnB3WkVoV2VVbElVbWhpVjBwb1lVZEdkVWxETUhSUVoyOW5TVU5CWjFC","SFVuQmthVUpxWWtkR2VtTjZNR2xrUnpsdVdqSjRiRXhYU2pCaWFVa3JVVmhX","TUdKNVFrSmhWekJuVVZaa1RrbFFRMlpxY1RoTFNVTkJaMGxEUVdkUVIzaG9X","VzFXYzBsSFRuTlpXRTU2VUZOS2VtUXliREJaTW1kcFVHcDRjR0p1UWpGa1Ew","SXdaVmhDYkZCVFNtcGhSMVpxWVRKS2RtVkRTU3RRU0U1M1dWYzBaMWt5ZUdo","ak0wMDVTVzVPYzJGWFVteGphVWtyVUVNNWVtTkhSblZRYW5kMllrZEdhVnBY","ZHl0RGFVRm5TVU5CT0V3eVVuQmthalJMU1VOQk9Fd3lVbkJrYWpSTFNVTkJP","RnB0T1haa1IxWjVVSE5MY0VsRVNYZE5hbFZuVmtkb2JFbEdjRFZqYlZZMFRH","bENRbUpIZDJkamJXeHVZVWhTZWtsSVNteGpNbFo1WkcxV2EweHFkM1phYlRs","MlpFZFdlVkJuYnpoTU1sSndaR28wUzBOcWVHdGhXRmxuWVZkUk9VbHROWFpr","UjJ4dFlWZE9hR1JIYkhaaWFVbG5XVEo0YUdNelRUbEpiVFYyWkVkc2JXRlhU","bWhrUjJ4MlltbEpLMUJET1d0aFdGa3JRMmR2T0dNeVRubGhXRUl3VUdkdmRr","dHBRa05aVjA1eVdqTktkbVJYTld0SlJrSm9ZMjVTY0dFeVZuTkpRMjkyUTIx","T2RtSnVUakJKUjA1b1ltNWFhR042TVd0aU1rNHhZbGRXZFdSRE5XNWFXRkpH","WWtkV2RGcFhOVEJSYm14S1drTm5hV05IUm5sa1IyeHFZa2RXZWtscGF6ZERi","VTUyWW01T01FbEhUakJsUkRGcVdWYzFNbGxZVFhWYU1sWXdVVEk1ZFdSSFZq","UmtRMmRwVFcxUmFVdFVjMHRpUjFZd1NVaENhR051VW5CWk1uaHNZM294WWxo","VWMwdGFibFoxV1ROU2NHSXlOR2RqYlZaNllWaHdiRXREYkRkWk1rWjFaRzFH","ZWt4dVpIQmFTRkp2VUZoa2NHSnRVblprZVRWd1ltMDFiR05zWkhCYVNGSnZU","ekpPYUdKdVdtaGplVFZ2V2xkc2JtRklVVGxrTW14MVdrYzVNMHh0YkhWaWJW","WjVVMGRXY0ZveWFEQlBNekJMWkRKc2RWcEhPVE5NYlVacldrVldNbHBYTlRC","VVIyeDZaRWRXZFZwWVNXOUpia3BzWXpKc05scFRTWE5qYlZaNllWaHdiRXRV","ZEhsYVdFNXdaVzFWYjB0VWMwdGFibFoxV1ROU2NHSXlOR2RoVnpWd1pFWkNh","R051VW5CWk1uaHNZM2xuY0dWM2IyZEpTRUpvWTI1U2NGa3llR3hqZWpGaVdG","UnpTMGxEUW0xaU0wbHZZa2RXTUVsSGF6bE5SSFJ3VUVSamQwOHlhM0pMZVd3","M1EybEJaMGxEUW5kWldFb3dZVmRPYzFwWVRYVmpTRlo2WVVOb04yVkVjRTVa","V0ZKdlRHNUthR0p0VW5aaVUyZHdTMjFPYUdKdVdtaGplVFV6WVZkU01HRkRl","RFZQYXpGb1pFZG5kV050Um5WYVJ6bDBTME5yY1ZreVJuVmtiVVo2VEcxb2JH","RlhaRzlrUTNkTFNVTkJaMGxEUVdka2JtYzJTMFV4YUdSSFozVmpiVVoxV2tj","NWRFdERhM1JOUXpReFMxTnZkMHhxVlhOa2JtczJTMFV4YUdSSFozVmpiVVox","V2tjNWRFdERhM1JOUXpReFMxTnZkMHhxVlhOamJVWnJZVmhXZWs5ck1XaGtS","MmQxWTIxR2RWcEhPWFJMUTJ0eFRXbHplR1pUYXpkRGFVRm5abEZ3T1VOdFdq","RmliVTR3WVZjNWRVbEhVbmxaV0dSUldWaEtNR0ZYVG5OYVdFMXZTMWh6UzBs","RFFtcGtTR2QxV1RKNGJGbFlTbE5hVjA0d1MwUkJjMDFEZUdwWlZ6VXlXVmhO","ZFdReWJHdGtSMmR6V1RKR2RXUnRSbnBNYldoc1lWZGtiMlJEYXpkRGFVRm5X","bTA1ZVV0SGVHeGtRMEozU1VjNWJVbElRbWhqYmxKd1dUSjRiR041YkRkRGFV","Rm5TVU5DYW1SSVozVlpiVlp1WVZjMVVWbFlVbTlMUTJzM1EybEJaMGxEUW1w","a1NHZDFXVmhLYWt0SVFYVmxRM2gzVEc1cmMyTkROWGxaVjFKd1pGaE5jMDFE","ZUU1WldGSnZUR3hDU2t0cVNYQlBkMjluU1VOQloxa3pValJNYlZwd1lrZDRW","R1JJYkhOYVZEQnBZMjFrYVZsVFozZE1SRWt4VGxOM2VVMUVRWE5OUXpRMFMx","TkpOME5wUVdkSlEwSnFaRWhuZFZwdGJITmlRMmR3VDNkdlowbElNRXRKUTBK","dFlqTkpiMkpIVmpCSlIyczVUVVIwY0ZCSVFtaGpibEp3V1RKNGJHTjVOWE5h","VnpWdVpFZG5OMkZUYzNKTFdITkxTVU5CWjBsSFduWmphV2h6V2xoUloyRnFN","WEJMZWtVM1lXcDRkMWxZU2pCaFYwNXpXbGhOZFdKSFZuVmFNMUp2VHpKdmNr","dDViRGREYVVGblNVTkJaMGxIZUd4a1EwSnJaVVF4ZDFsWVNqQmhWMDV6V2xo","T1ltRldNSFZsUXpGM1dWaEtNR0ZYVG5OYVdFNWlZV3d3ZFdWRWMwdEpRMEZu","U1VOQloySkhWakJKUjFJMVVGaENhR051VW5CWk1uaHNZekYwY0ZoVE5UVk1X","RUpvWTI1U2NGa3llR3hqTVhSeFdGTTFOVTkzYjJkSlEwRm5TVU5DYzFwWVVX","ZGFSMng2WkVReFRsbFlVbTlNYms1NFkyNVJiMXBJWjNGYVNHZHlXa2hyY1Zw","SWEzQlBkMjluU1VOQlowbERRbkJhYVdocllWaE9NRkJFUlhkTlEydzNRMmxC","WjBsRFFXZEpRMEZuV1ROU05FeHRTbXhhTW14MVZVZEdNR0ZEWjNCUGQyOW5T","VU5CWjBsRFFXZEpSMDR3WlVNMWVtUklTblpoTWxaVVpFaHNjMXBVTUdsamJX","UnBXVk5uZDB4RVNURk9VM2Q0VGxSQmMwMUROSGhPVTJ0cFQzZHZaMGxEUVdk","SlEwRm5TVWRPTUdWRE5YTmhWelZzVmpKc2EyUkhaemxOVkhOTFNVTkJaMGxE","UVdkSlEwSnFaRWhuZFdKWE9USmFWbEoyUzBoQ2FHTnVVbkJaTW5oc1l6RjBj","RmhUTlRSTVNFSm9ZMjVTY0ZreWVHeGpNWFJ3V0ZNMU5VdFVjMHRKUTBGblNV","TkJaMGxEUW1wa1NHZDFZa2RzZFZwV1VuWkxTRUpvWTI1U2NGa3llR3hqTVhS","eFdGTTFORXhJUW1oamJsSndXVEo0YkdNeGRIRllVelUxUzFSelMwbERRV2RK","UTBGblNVTkNhbVJJWjNWak0xSjVZakowYkV0RGF6ZERhVUZuU1VOQlowbElN","RXRKUTBGblNVZ3dTMGxEUWpsRGJqQkxXbTVXZFZrelVuQmlNalJuWkZoQ2Ex","bFlVbXhWUjBaNVpFZHNhbUpIVm5wTFEydzNRMmxCWjFwdE9YbExSM2hzWkVO","Q2QwbEhPVzFKU0VKb1kyNVNjRmt5ZUd4amVXdzNRMmxCWjBsRFFuZE1ibWR5","VUZoQmRXUnVaemRqUXpVMVMzb3hkMHh1V2pWUGQyOW5TVU5CWjJGWFdXOWpR","elUwVUVSQ09HWklRWFZsUkRWcVdWYzFNbGxZVFhWa01teHJaRWRuY0dORE5U","SmxRMjg1VEZSRk4wTnBRV2RKUTBKd1dtbG9kMHh1YXpoTlNIZzRZME0xTlZC","dFRtaGlibHBvWTNrMWIxcFhiRzVoU0ZGd1kwTTFNbVZUYnpsTVZFVTNRMmxC","WjJaUmNEbERiVm94WW0xT01HRlhPWFZKUjBaMVlWY3hhR1JIVlc5TFdIUnJZ","MjFHTTFWSFJubGtSMnhxWWtkV2VrdERhemRrV0VKcldWaFNiRlZIUm5sa1Iy","eHFZa2RXZWt0RGF6ZGpiVlo0WkZkV2VtUkZSblZoVnpGb1pFZHNkbUpyV25s","WlZ6RnNTMGRHZFdGWE1XaGtSMVZ3VHpNd1MyRlhOWEJrUmtKb1kyNVNjRmt5","ZUd4amVXZHdUekpHZFdGWE1XaGtSMVZ2UzFSelMwTnBPSEZKUlRWMlpFZHNi","V0ZYZEdoak1tdG5TMms0UzFreU9YVmpNMUZuWW0wNU1HRlhXbkJaTWtZd1lW","YzVkVkJYVW5aWk0xWjBXbGMxTUV4dFpHeGtSVlp6V2xjeGJHSnVVa05sVld4","clMwTktkV0l6VW5CYWJXeHFXVmhTY0dJeU5HbExWSE5MV201V2RWa3pVbkJp","TWpSbll6Sm9kbVF3Tlhaa1IyeHRZVmRPYUdSSGJIWmlhV2gwWXpKamMyRllU","a0paTTFKd1pHMVZjR1YzYjJkSlJ6VjJaRWRzYldGWFRtaGtSMngyWW1rMU1G","cFlhREJSTWpsMVpFZFdkV1JFTVhSak1tTTNRMmxCWjJKdE9UQmhWMXB3V1RK","R01HRlhPWFZNYlU1eldWaE9lbFJ0Um5SYVZEQnBZbTA1TUdGWFduQlpNa1l3","WVZjNWRVbElUbTlpTTJOblNXbHpiMkZZVGtKWk0xSndaRzFWTDBsdFJtcGtS","Mnd5V2xOSk5rbHROWFppYlVacVpFZHNNbHBUU1hCUGQyOW5TVWhPYkdSR1Vu","QmlWMVoyWkZoUmIwdERhemxRYm5SMVlqTlNjRnB0YkdwWldGSndZakkwZFZr","eWVHaGpNMDVOWVZoT01FeHVTbXhpVnpreVdsTm5hV015YUhaa2VVbHdUek13","YzAxcVFYZE5RMnMzUTI0d1MwTnBPSEZKUlhoMldqSnNkVWxEYjNaRGJVNTJZ","bTVPTUVsSGVIWmFNbXgxVVc1U2RWQlhVblpaTTFaMFdsYzFNRXh0Wkd4a1JW","WnpXbGN4YkdKdVVrTmxWV3hyUzBOS2MySXlaSEJpYTBvd1ltbEpjRTkzY0dw","aU1qVjZaRU5DTVdNeVZubGliVVowV2xWc2RXTklWakJRVjFKMldUTldkRnBY","TlRCTWJXUnNaRVZXYzFwWE1XeGlibEpEWlZWc2EwdERTakZqTWxaNVltMUdk","RnBUU1hCUGQzQnFZakkxZW1SRFFuZFpXRTU2WkRJNWVWcEZiSFZqU0ZZd1VG","ZFNkbGt6Vm5SYVZ6VXdURzFrYkdSRlZuTmFWekZzWW01U1EyVlZiR3RMUTBw","M1dWaE9lbVF5T1hsYVEwbHdUM2R3YW1JeU5YcGtRMEozWTIwNWJtTnRWbnBq","TUVwb1kyb3hhMkl5VGpGaVYxWjFaRU0xYmxwWV
+/* Background Partikel */
+const canvas=document.getElementById("particles");
+const ctx=canvas.getContext("2d");
+let particles=[];
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+window.addEventListener("resize",resize);resize();
+function initParticles(){
+  particles=[];
+  for(let i=0;i<70;i++){
+    particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,
+      vx:(Math.random()-0.5)*0.5,vy:(Math.random()-0.5)*0.5,radius:Math.random()*2+1});
+  }
+}
+function drawParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let p of particles){
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+    ctx.fillStyle="rgba(0,255,200,0.8)";
+    ctx.fill();
+  }
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      let dx=particles[i].x-particles[j].x;
+      let dy=particles[i].y-particles[j].y;
+      let dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<100){
+        ctx.beginPath();
+        ctx.strokeStyle="rgba(0,255,150,0.15)";
+        ctx.lineWidth=1;
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+}
+function updateParticles(){
+  for(let p of particles){
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>canvas.width)p.vx*=-1;
+    if(p.y<0||p.y>canvas.height)p.vy*=-1;
+  }
+}
+function animate(){drawParticles();updateParticles();requestAnimationFrame(animate);}
+initParticles();animate();
+
+/* Notifikasi */
+const notification=document.getElementById("notification");
+function showNotification(msg,isActive){
+  notification.textContent=msg;
+  notification.className="notification show "+(isActive?"active":"nonactive");
+  setTimeout(()=>{notification.classList.remove("show");},2000);
+}
+
+/* Login */
+const loginBtn=document.getElementById("loginBtn");
+const usernameInput=document.getElementById("username");
+const passwordInput=document.getElementById("password");
+const progressBar=document.getElementById("progressBar");
+const progressFill=document.getElementById("progressFill");
+const waitText=document.getElementById("waitText");
+const loginCard=document.getElementById("loginCard");
+const panelCard=document.getElementById("panelCard");
+
+loginBtn.addEventListener("click",()=>{
+  progressBar.style.display="block";
+  waitText.style.display="block";
+  progressFill.style.width = '0%';
+  let width = 0;
+  const interval = setInterval(()=>{
+    width += 2;
+    progressFill.style.width = width + '%';
+    if(width >= 100){
+      clearInterval(interval);
+      setTimeout(()=>{
+        progressBar.style.display="none";
+        waitText.style.display="none";
+        if(usernameInput.value==="zyrex" && passwordInput.value==="free"){
+          showNotification("Login Successful ✅",true);
+          loginCard.style.display="none";
+          panelCard.style.display="block";
+          setTimeout(()=>{panelCard.classList.add("show");},50);
+          document.querySelectorAll('.toggle-btn input').forEach(input=>{
+            input.addEventListener('change',()=>{
+              if(input.checked){
+                showNotification("Actived ✅",true);
+              } else {
+                showNotification("Non-Actived ❌",false);
+              }
+            });
+          });
+        } else {
+          showNotification("Login Failed ❌",false);
+        }
+      }, 200);
+    }
+  }, 20);
+});
+</script>
+</body>
+</html>
